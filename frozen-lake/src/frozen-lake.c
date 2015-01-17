@@ -1,15 +1,17 @@
 #include <pebble.h>
 
 struct event{
-  char *name,
-  time_t start,
-  time_t end
-}
+  char *name;
+  time_t start;
+  time_t end;
+};
 
 static Window *window;
 static TextLayer *s_time_layer;
-static TextLayer *s_event_layer; // current event name
+//static TextLayer *s_event_layer; // current event name
 static GFont s_time_font;
+static InverterLayer *s_invert_screen;
+static bool s_enable_invert_screen = true;
 
 /* Communication with phone/internet */
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
@@ -75,6 +77,11 @@ static void window_load(Window *window) {
   text_layer_set_font(s_time_layer, s_time_font);
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+
+  if(s_enable_invert_screen){
+    s_invert_screen = inverter_layer_create(GRect(0, 0,  bounds.size.w,  bounds.size.h));
+    layer_add_child(window_layer, inverter_layer_get_layer(s_invert_screen));
+  }
 }
 
 static void window_unload(Window *window) {
