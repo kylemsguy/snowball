@@ -1,12 +1,12 @@
 {
   "uuid": "1a7de43d-74bb-4338-bb4d-ce6fe2da55b4",
-  "shortName": "frozen-lake",
-  "longName": "frozen-lake",
+  "shortName": "Snowball",
+  "longName": "Snowball",
   "companyName": "MakeAwesomeHappen",
   "versionCode": 1,
   "versionLabel": "1.0",
   "watchapp": {
-    "watchface": false
+    "watchface": true
   },
   "appKeys": {
     "dummy": 0
