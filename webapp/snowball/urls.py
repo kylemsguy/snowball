@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^callback', 'winter.views.contextio_callback'),
     url(r'^callback_fail', 'winter.views.contextio_failure_callback'),
+    url('', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^$', 'winter.views.home', name='home'),
 )

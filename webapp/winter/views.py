@@ -18,3 +18,6 @@ def contextio_failure_callback(request):
 	payload = json.loads(str(request.body, 'utf-8'))
 	print(payload)
 	return HttpResponse("Success")
+
+def home(request):
+	return render(request, 'winter/home.html', {})
