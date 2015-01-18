@@ -15,5 +15,6 @@ urlpatterns = patterns('',
     url(r'^$', 'winter.views.home', name='home'),
     url(r'^link_email$', 'winter.views.link_email', name='link_email'),
     url(r'^link_email_callback$', 'winter.views.link_email_callback', name='link_email_callback'),
-    url(r'^signup', 'winter.views.signup', name='link_email'),
+    url(r'^signup$', 'winter.views.signup', name='link_email'),
+    url(r'^testme$', 'winter.views.testme', name='testme'),
 )

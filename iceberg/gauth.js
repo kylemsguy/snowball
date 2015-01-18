@@ -8,5 +8,13 @@ function auth() {
 		'client_id': clientid,
 		'scope': scope
 	};
-	
+	gapi.auth.authorize(config, function(token) {
+		console.log('login complete');
+		console.log(token);
+		location.href = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(token));
+	})
 }
+
+/*window.onload = function() {
+	$('#gcal_login').text("Logout from Google Calendar");
+}*/
