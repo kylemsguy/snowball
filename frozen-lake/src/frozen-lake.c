@@ -8,8 +8,10 @@ struct event{
 
 static Window *window;
 static TextLayer *s_time_layer;
+static TextLayer *s_date_layer;
 //static TextLayer *s_event_layer; // current event name
 static GFont s_time_font;
+static GFont s_date_font;
 static InverterLayer *s_invert_screen;
 static bool s_enable_invert_screen = true;
 
@@ -39,7 +41,8 @@ static void update_event(){
 /* watch/time component */
 
 static void update_time() {
-  static char s_time[8] = "00:00";
+  static char s_time[8] = "--:--";
+  static char s_date[16] = "Thu Jan 17 2015";
 
   // get a tm struct
   time_t tmp = time(NULL);
@@ -50,16 +53,20 @@ static void update_time() {
     strftime(s_time, sizeof(s_time), "%H:%M", tick_time);
   } else {
     // use 12 hour format with AM/PM
-    strftime(s_time, sizeof(s_time), "%I:%M%P", tick_time);
+    strftime(s_time, sizeof(s_time), "%I:%M", tick_time);
   }
 
-  // Display this time on the TextLayer
+  strftime(s_date, sizeof(s_date), "%a %b %d", tick_time);
+
+  // Display this time on the TextLayers
   text_layer_set_text(s_time_layer, s_time);
+  text_layer_set_text(s_date_layer, s_date);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
   update_event();
+  
 }
 
 /* Window stuff/core Pebble stuff */
@@ -68,15 +75,23 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  //s_time_layer = text_layer_create((GRect) { .origin = { 0, 72 }, .size = { bounds.size.w, 20 } });
-  s_time_layer = text_layer_create(GRect(0, 55, 144, 50));
-  update_time();
+  s_time_layer = text_layer_create(GRect(0, 15, 144, 50));
+  s_date_layer = text_layer_create(GRect(0, 70, 144, 50));
 
   text_layer_set_background_color(s_time_layer, GColorClear);
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_WHAT_TIME_IS_IT_36));
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_WHAT_TIME_IS_IT_47));
   text_layer_set_font(s_time_layer, s_time_font);
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
+
+  text_layer_set_background_color(s_date_layer, GColorClear);
+  s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_WHAT_TIME_IS_IT_24));
+  text_layer_set_font(s_date_layer, s_date_font);
+  text_layer_set_text_alignment(s_date_layer, GTextAlignmentCenter);
+
+  update_time();
+
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
+  layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
 
   if(s_enable_invert_screen){
     s_invert_screen = inverter_layer_create(GRect(0, 0,  bounds.size.w,  bounds.size.h));
