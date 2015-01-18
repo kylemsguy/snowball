@@ -34,20 +34,23 @@ enum {
   RESULT_END = 0x3, // TUPLE_time_t
 };
 
+static void update_failed();
+static void update_event();
+
 /* Communication with phone/internet */
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Message received! Processing...");
-  Tuple *status = dict_find(iter, RESULT_STATUS);
+  Tuple *status = dict_find(iterator, RESULT_STATUS);
   if(status){
     if(status->value->uint8 == 0){
       // success get info
-      Tuple *event_title = dict_find(iter, RESULT_TITLE);
-      Tuple *event_start = dict_find(iter, RESULT_START);
-      Tuple *event_end = dict_find(iter, RESULT_END);
+      Tuple *event_title = dict_find(iterator, RESULT_TITLE);
+      Tuple *event_start = dict_find(iterator, RESULT_START);
+      Tuple *event_end = dict_find(iterator, RESULT_END);
 
-      strncpy(&current_event.name, event_title->value->cstring, EVENT_STR_LIMIT+1);
+      strncpy(current_event.name, event_title->value->cstring, EVENT_STR_LIMIT+1);
       current_event.start = ((time_t) event_start->value->uint32);
-      current_event.end = ((time_t) event_start->value->uint32);
+      current_event.end = ((time_t) event_end->value->uint32);
       update_event();
     }
     else
@@ -68,16 +71,16 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 }
 
 static void request_update(){
-  Tuplet value = TupletCString(0, 1);
+  Tuplet value = TupletInteger(0, (uint8_t) 1);
 
   DictionaryIterator *iter;
-  app_message_outbox_begin(iter);
+  app_message_outbox_begin(&iter);
 
   if(iter == NULL)
     return;
 
-  dict_write_tuplet(iter, value);
-  dict_write_end();
+  dict_write_tuplet(iter, &value);
+  dict_write_end(iter);
 
   app_message_outbox_send();
 
