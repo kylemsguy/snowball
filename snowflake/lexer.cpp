@@ -46,9 +46,12 @@ std::unordered_map<string, Date_val> keywords {
 
     {"and",{Kind::CONT,0}},
 
-    // action 0: cancelled 1: moved 
+    // action 0: cancelled 1: moved  2: add
     {"Cancelled",{Kind::ACT,0}},{"Cancel",{Kind::ACT,0}},{"cancelled",{Kind::ACT,0}},{"cancel",{Kind::ACT,0}},
+    {"Canceled",{Kind::ACT,0}},{"canceled",{Kind::ACT,0}},
     {"Moved",{Kind::ACT,1}},{"Move",{Kind::ACT,1}},{"move",{Kind::ACT,1}},{"moved",{Kind::ACT,1}},
+    {"Rescheduled",{Kind::ACT,1}},{"rescheduled",{Kind::ACT,1}},
+    {"Add",{Kind::ACT,2}},{"add",{Kind::ACT,2}}
 
     };
 

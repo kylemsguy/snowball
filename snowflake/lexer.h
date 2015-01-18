@@ -80,7 +80,7 @@ private:
     istream* ip;    // input stream pointer
     Token ct {};   // current token, default value in case of misuse
     Token pt {};
-    Token act {};   // 1 action per stream
+    Token act {Kind::ACT, 2, 0};   // 1 action per stream
     string crs;
     string loc;
     School_protocol* protocol;
