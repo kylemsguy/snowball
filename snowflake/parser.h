@@ -6,6 +6,9 @@
 
 using namespace std;
 
+bool close_enough(int epsilon) {
+    return ts.current().pos - ts.prev().pos < epsilon;
+} 
 
 vector<Date> all_dates(Date sentdate) {    // add and subtract
 	vector<Date> res;
@@ -48,21 +51,32 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
                     ts.clear();
                 }
                 // next wednesday, need to know what day currently is
-                else if (ts.prev().kind == Kind::REL) {
+                else if (ts.prev().kind == Kind::REL && close_enough(3)) {
                     cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << endl;
-            		cur += ts.prev().number_val;
-            		cur += ts.current().number_val - cur.dayofweek();
+                    cur += ts.prev().number_val;
+                    cur += ts.current().number_val - cur.dayofweek();
 
-            		res.push_back(cur);
+                    res.push_back(cur);
                     cur = sentdate;
-            		ts.clear();
-            	}
-            	break;
+                    ts.clear();
+                }
+                break;
             } 
             case Kind::MTH: {
                 // only valid if no other valid types have been matched    
                 cur.mth() = ts.current().number_val;
-        		cerr << "MTH date found " << cur.mth() << endl;
+                cerr << "MTH date found " << cur.mth() << endl;
+                // for odd naming scheme like 23 Oct, close enough together
+                if (ts.prev().kind == Kind::DAY && close_enough(3)) {
+                    cur.day() = ts.prev().number_val;
+
+                    cerr << "MTH date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << endl;
+
+                    res.push_back(cur);
+                    cur = sentdate;
+                    ts.clear();
+                }
+
 
             	break;
             }

@@ -11,7 +11,7 @@ struct Token {
     Kind kind;
     int number_val;
     int pos;   // position in the text, used for proxity checking
-    Token() : kind{Kind::NUL} {}
+    Token() : kind{Kind::NUL}, pos{-1} {}
     Token(Kind k, int v, int p) : kind{k}, number_val{v}, pos{p} {}
 };
 
