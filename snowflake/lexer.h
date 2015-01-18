@@ -26,18 +26,26 @@ public:
     Token& current() { return ct; } // most recently read token
     Token& cur() { return ct; } 
     Token& prev() { return pt; }
-    Token& action() { return act; }
     int peek() const {return ip->peek();}
     bool eof() const { return ip->eof() || ip->peek() == -1; }
     void set_input(istream& instream_ref) {if (owns) delete ip; ip = &instream_ref; owns = false;}
     void set_input(istream* instream_pt) {if (owns) delete ip; ip = instream_pt; owns = true;}
     void clear() { ct = {}; pt = {}; }
+    // for starting another stream
+    void reset() {if (owns) delete ip; clear(); act = {}; pos = -1; owns = false;}
+
+
+    Token& action() { return act; }
+    const string& course() { return crs; }
+    const string& location() { return loc; }
 
 private:
     istream* ip;    // input stream pointer
     Token ct {};   // current token, default value in case of misuse
     Token pt {};
     Token act {};   // 1 action per stream
+    string crs;
+    string loc;
     int pos;       // start at -1 to increment before usage in get (so 0 is first)
     bool owns;
 };

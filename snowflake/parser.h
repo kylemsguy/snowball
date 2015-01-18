@@ -11,7 +11,7 @@ bool close_enough(int epsilon) {
     return ts.current().pos - ts.prev().pos < epsilon;
 } 
 
-vector<Date> all_dates(Date sentdate) {    // add and subtract
+vector<Date> eval(Date sentdate) {    // add and subtract
 	vector<Date> res;
     Date cur{sentdate};
     while (!ts.eof()) {

@@ -86,7 +86,7 @@ Token Token_stream::get() {
             cerr << "NUMBER: " << static_cast<char>(ct.kind) << ' ' << ct.number_val << endl;
             if (ct.number_val > 31 || ct.number_val < 0) ct.kind = Kind::NUL;
             else if (ct.kind == Kind::MTH || ct.kind == Kind::DAY || ct.kind == Kind::CONT || 
-                (c == 't' && ip->peek() == 'h') || (c == 'r' && ip->peek() == 'd') || (c == 's' && ip->peek() == 't'))
+                (ip->peek() == 't') || (ip->peek() == 'r') || (ip->peek() == 's'))
                 ct.kind = Kind::ABS;
             else ct.kind = Kind::NUL;   // 9 am, other unknown dates
 
@@ -94,13 +94,6 @@ Token Token_stream::get() {
             return ct;
         default:    // name, name =, or error
             if (isalpha(c)) {
-                if (ct.kind == Kind::DAY) { // 10th, 1st, etc..
-                    // read through past 2 characters
-                    while (ip->get(c) && isalpha(c)) ;
-
-                    ct.pos = pos;
-                    return ct;                    
-                }
                 // potential keyword
                 string kw (1,c);
                 while (ip->get(c) && isalpha(c))
