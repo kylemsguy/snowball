@@ -41,12 +41,17 @@ def handle_callback(user, user_profile, provider, payload):
 		if body["type"] == "text/plain":
 			break
 	plain_text = body["content"]
-	#dates = snowflake_runner.run_snowflake(datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), plain_text)
+	action, course, location, date, header = snowflake_runner.run_snowflake(
+		datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), payload["message_data"]["subject"] +
+		"\n" + plain_text)
 	social = user.social_auth.get(provider="google-oauth2")
 	strategy = load_strategy()
 
 	social.refresh_token(strategy)
-	quick_add_event(social.tokens, user.email, plain_text)
+	if action == 0: # delete
+		delete_matching_event(social.tokens, user.email, course, location, date)
+	elif action == 1 or action == 2:
+		quick_add_event(social.tokens, user.email, plain_text if len(header) < 2 else header)
 
 @csrf_exempt
 def contextio_failure_callback(request):
@@ -94,5 +99,5 @@ def testme(request):
 	strategy = load_strategy()
 
 	social.refresh_token(strategy)
-	change_event(social.tokens, user.email, request.GET["month"], request.GET["day"], request.GET["code"], request.GET["action"])
+	delete_matching_event(social.tokens, user.email, "BME250", "", (15, 1, 2015))
 	return HttpResponse("yay")
