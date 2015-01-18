@@ -10,6 +10,10 @@ import json
 from winter.models import *
 import datetime
 import traceback
+import snowflake_runner
+from django.contrib.auth.models import User
+from throw_ball import *
+from social.apps.django_app.utils import load_strategy
 
 # Create your views here.
 
@@ -29,7 +33,7 @@ def contextio_callback(request):
 			handle_callback(user, user_profile, provider, payload)
 		return HttpResponse("Success")
 	except BaseException as e:
-		traceback.format_exc
+		print(traceback.format_exc())
 		raise e
 
 def handle_callback(user, user_profile, provider, payload):
@@ -37,7 +41,12 @@ def handle_callback(user, user_profile, provider, payload):
 		if body["type"] == "text/plain":
 			break
 	plain_text = body["content"]
-	print(plain_text)
+	#dates = snowflake_runner.run_snowflake(datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), plain_text)
+	social = user.social_auth.get(provider="google-oauth2")
+	strategy = load_strategy()
+
+	social.refresh_token(strategy)
+	quick_add_event(social.tokens, user.email, plain_text)
 
 @csrf_exempt
 def contextio_failure_callback(request):
@@ -77,3 +86,13 @@ def signup(request):
 		request.session[a] = request.POST[a]
 
 	return social.apps.django_app.views.auth(request, request.backend)
+
+def testme(request):
+	user = User.objects.get(email="gingeralebot@gmail.com")
+	user_profile = UserProfile.objects.get(user=user)
+	social = user.social_auth.get(provider="google-oauth2")
+	strategy = load_strategy()
+
+	social.refresh_token(strategy)
+	change_event(social.tokens, user.email, request.GET["month"], request.GET["day"], request.GET["code"], request.GET["action"])
+	return HttpResponse("yay")
