@@ -1,6 +1,8 @@
 #include <unordered_map>
 #include "lexer.h"
 
+constexpr int lifetime = 1;
+
 using namespace std;
 
 struct Date_val {
@@ -52,7 +54,11 @@ Token Token_stream::get() {
     ++pos;
     char c = 0;
     // update only if valuable
-    if (ct.kind != Kind::NUL) pt = ct;
+    if (ct.kind != Kind::NUL) {
+        pt = ct;
+        // throw out if too old
+        if (pos > ct.pos + lifetime) ct = {};
+    }
 
     do {  // skip all whitespace except newline
         if(!ip->get(c)) return ct = {};  // no char can be read from ip
