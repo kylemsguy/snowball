@@ -42,7 +42,8 @@ def handle_callback(user, user_profile, provider, payload):
 			break
 	plain_text = body["content"]
 	action, course, location, date, header = snowflake_runner.run_snowflake(
-		datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), plain_text)
+		datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), payload["message_data"]["subject"] +
+		"\n" + plain_text)
 	social = user.social_auth.get(provider="google-oauth2")
 	strategy = load_strategy()
 
