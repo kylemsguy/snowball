@@ -6,18 +6,25 @@ struct event{
   time_t end;
 };
 
+typedef struct event Event;
+
 static Window *window;
 static TextLayer *s_time_layer;
 static TextLayer *s_date_layer;
-//static TextLayer *s_event_layer; // current event name
+static TextLayer *s_event_layer1; // current event name
+static TextLayer *s_event_layer2; // extra data for said event
 static GFont s_time_font;
 static GFont s_date_font;
+static GFont s_event_font;
 static InverterLayer *s_invert_screen;
 static bool s_enable_invert_screen = true;
 
+Event current;
+Event next;
+
 /* Communication with phone/internet */
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
-  //APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
+  APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
   // want: next event start/end, after that start/end
 }
 
@@ -75,8 +82,9 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_time_layer = text_layer_create(GRect(0, 15, 144, 50));
-  s_date_layer = text_layer_create(GRect(0, 70, 144, 50));
+  // initialize time/date display
+  s_time_layer = text_layer_create(GRect(0, 5, 144, 50));
+  s_date_layer = text_layer_create(GRect(0, 60, 144, 50));
 
   text_layer_set_background_color(s_time_layer, GColorClear);
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_WHAT_TIME_IS_IT_47));
@@ -90,8 +98,25 @@ static void window_load(Window *window) {
 
   update_time();
 
+  // set up event layers
+  s_event_layer1 = text_layer_create(GRect(0, 100, 144, 50));
+  s_event_layer2 = text_layer_create(GRect(0, 125, 144, 50));
+  
+  text_layer_set_text_alignment(s_event_layer1, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_event_layer2, GTextAlignmentCenter);
+
+  s_event_font = fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
+  text_layer_set_font(s_event_layer1, s_event_font);
+  text_layer_set_font(s_event_layer2, s_event_font);
+
+  text_layer_set_text(s_event_layer1, "Please wait.");
+  text_layer_set_text(s_event_layer2, "Loading data...");
+
+  // add the layers to the window
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
   layer_add_child(window_layer, text_layer_get_layer(s_date_layer));
+  layer_add_child(window_layer, text_layer_get_layer(s_event_layer1));
+  layer_add_child(window_layer, text_layer_get_layer(s_event_layer2));
 
   if(s_enable_invert_screen){
     s_invert_screen = inverter_layer_create(GRect(0, 0,  bounds.size.w,  bounds.size.h));
