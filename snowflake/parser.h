@@ -24,8 +24,8 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
         	}
         	// 4th, 5th, ... first absolute day in month
         	case Kind::ABS: {
-        		cout << "ABSolute date found\n";
-        		if (ts.prev().kind == Kind::MTH) {
+        		cout << "ABSolute date found " << static_cast<char>(ts.prev().kind) << ' ' << ts.current().number_val << '\n';
+        		if (ts.prev().kind == Kind::MTH || ts.prev().kind == Kind::NUL) {
         			cur.day() = ts.current().number_val;
         			res.push_back(cur);
 
@@ -37,13 +37,15 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
         		cout << "DAY date found\n";
             	// assume next if not specified, eg. the assignment is due [this] thursday
             	if (ts.prev().kind == Kind::NUL) {
-            		cur +=  ts.current().number_val - cur.dayofweek();
-            		res.push_back(cur);
+                    cout << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << ts.current().number_val << endl;
+                    cur +=  ts.current().number_val - cur.dayofweek();
+                    res.push_back(cur);
 
-            		ts.clear();
-            	}
-        		// next wednesday, need to know what day currently is
-            	else if (ts.prev().kind == Kind::REL) {
+                    ts.clear();
+                }
+                // next wednesday, need to know what day currently is
+                else if (ts.prev().kind == Kind::REL) {
+                    cout << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << ts.current().number_val << endl;
             		cur += ts.prev().number_val;
             		cur += ts.current().number_val - cur.dayofweek();
             		res.push_back(cur);
@@ -54,11 +56,9 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
             } 
             case Kind::MTH: {
         		cout << "MTH date found\n";
-            	// only valid if no other valid types have been matched
-            	if (ts.prev().kind == Kind::NUL)
-            		cur.mth() = ts.current().number_val;
-            	else
-            		ts.clear();
+            	// only valid if no other valid types have been matched    
+        		cur.mth() = ts.current().number_val;
+
             	break;
             }
             case Kind::REL: {

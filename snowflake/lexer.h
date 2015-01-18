@@ -5,7 +5,7 @@
 using namespace std;
 
 enum class Kind : char {
-    NUL, ABS, MTH, DAY, REL, DIR
+    ABS = 'a', DIR = 'b', DAY = 'd', MTH = 'm', NUL = 'n', REL = 'r'
 };
 struct Token {
     Kind kind;
@@ -25,8 +25,8 @@ public:
     Token& prev() { return pt; }
     int peek() const {return ip->peek();}
     bool eof() const { return ip->eof() || ip->peek() == -1; }
-    void set_input(istream& instream_ref) {if (owns) delete ip; ip = &instream_ref;}
-    void set_input(istream* instream_pt) {if (owns) delete ip; ip = instream_pt;}
+    void set_input(istream& instream_ref) {if (owns) delete ip; ip = &instream_ref; owns = false;}
+    void set_input(istream* instream_pt) {if (owns) delete ip; ip = instream_pt; owns = true;}
     void clear() { ct = {}; pt = {}; }
 
 private:
