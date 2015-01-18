@@ -13,4 +13,7 @@ urlpatterns = patterns('',
     url(r'^callback_fail', 'winter.views.contextio_failure_callback'),
     url('', include('social.apps.django_app.urls', namespace='social')),
     url(r'^$', 'winter.views.home', name='home'),
+    url(r'^link_email$', 'winter.views.link_email', name='link_email'),
+    url(r'^link_email_callback$', 'winter.views.link_email_callback', name='link_email_callback'),
+    url(r'^signup', 'winter.views.signup', name='link_email'),
 )

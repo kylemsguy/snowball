@@ -92,7 +92,10 @@ STATIC_URL = '/static/'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = local_config.google_client_id
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = local_config.google_client_secret
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ["https://www.googleapis.com/auth/calendar"]
-SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_ARGUMENTS = {
-      'access_type': 'offline'
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+      'access_type': 'offline',
+      'prompt': 'select_account',
 }
+
+LOGIN_REDIRECT_URL = '/link_email'
 
