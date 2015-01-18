@@ -88,25 +88,21 @@ struct Eval {
             		//cerr << "DAY date found\n";
                 	// assume next if not specified, eg. the assignment is due [this] thursday
                 	if (ts.prev().kind == Kind::NUL) {
-                        cur +=  ts.current().number_val - cur.dayofweek();
+                        cur += weekday_diff();
+                        // cur +=  ts.current().number_val - cur.dayofweek();
 
-                        //cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << " (" << ts.index() << ")\n";
+                        // cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << " (" << ts.index() << ")\n";
                         push();
-                        // dates.push_back(cur);
-                        // cur = sentdate;
-                        // ts.clear();
                     }
                     // next wednesday, need to know what day currently is
                     else if (ts.prev().kind == Kind::REL && close_enough(3)) {
                         cur += ts.prev().number_val;
-                        cur += ts.current().number_val - cur.dayofweek();
+                        cur += weekday_diff();
+                        // cur += ts.current().number_val - cur.dayofweek();
 
-                        //cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << " (" << ts.index() << ")\n";
+                        // cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << " (" << ts.index() << ")\n";
 
-                        push();
-                        // dates.push_back(cur);
-                        // cur = sentdate;
-                        // ts.clear();
+                        push();;
                     }
                     break;
                 } 
@@ -145,15 +141,23 @@ struct Eval {
             // select = cur;
             closest = false;
             select = cur;
-            cerr << "Finally selecting " << select << "-->" << ts.index() << endl;
+            // cerr << "Finally selecting " << select << "-->" << ts.index() << endl;
         }
         // haven't gone past 
         else if (closest) {
             select = cur;
-            cerr << "Selecting " << select << "-->" << ts.index() << endl;
+            // cerr << "Selecting " << select << "-->" << ts.index() << endl;
             last_index = ts.index();
         }
         cur = sentdate;
         ts.clear();
+    }
+
+    int weekday_diff() {
+        if (ts.current().number_val > cur.dayofweek()) {
+            // cerr << "Subtracting 7, so return " << cur.dayofweek() - ts.current().number_val - 7 << endl;
+            return ts.current().number_val - cur.dayofweek() - 7;
+        }
+        else return cur.dayofweek() - ts.current().number_val;
     }
 };
