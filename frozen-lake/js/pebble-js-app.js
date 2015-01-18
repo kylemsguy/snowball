@@ -7,7 +7,6 @@ Pebble.addEventListener('ready',
 Pebble.addEventListener('showConfiguration', function(e) {
   // Show config page
   Pebble.openURL('http://my-website.com/config-page.html');
-  
 });
 
 Pebble.addEventListener('webviewclosed',
