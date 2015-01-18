@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{% static 'winter/favicon.ico' %}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Snowball</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'winter/cover.css' %}" rel="stylesheet">
+
+ 
+  </head>
+
+  <body>
+
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">Snowball</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li><a href="#">Login</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+          <img src="{% static 'winter/footer.png' %}">
+          <div class="inner cover">
+            <h1 class="cover-heading">Effortless, timely school updates.</h1>
+            <p class="lead">Link up your school emails directly to your calender and get automatic updates.</p>
+
+          </div>
+        </div>
+		<div class="container">
+
+	      <form class="form-signin" action="/signup" method="POST">
+                {% csrf_token %}
+                <input class="form-control" placeholder="First name" name="first_name" required>
+                <input class="form-control" placeholder="Last name" name="last_name" required>
+	        <label for="school_email" class="sr-only">Email address</label>
+	        <input type="email" id="school_email" class="form-control" placeholder="School email" name="school_email" required autofocus>
+	        <!--<label for="calendar_email" class="sr-only">Calendar email</label>
+	        <input type="calendar" id="calendar_email" class="form-control" placeholder="Calendar email" name="login_hint" required>-->
+
+	        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign into Google Calendar</button>
+	      </form>
+
+	    </div> <!-- /container -->
+
+      </div>
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
