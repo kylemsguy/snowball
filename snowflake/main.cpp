@@ -10,11 +10,17 @@ int main(int argc, char* argv[]) {
     cin >> d >> m >> y;
   
     ts.set_input(cin);
-
-    auto dates = eval({d,m,y});
-    for (auto d : dates) 
+    Eval eval({d,m,y});
+    eval();
+    auto& dates = eval.dates;
+    for (auto& d : dates) 
         cerr << d << endl;
     if (dates.empty()) cout << "Empty dates!\n";
 
-    cerr << "Action: " << ts.action().number_val << endl;
+    cout << "Action: " << ts.action().number_val << endl;
+    cout << "Course: " << ts.course() << endl;
+    cout << "Location: " << ts.location() << endl;
+    cerr << "(" << ts.begin() << ',' << ts.end() << ")\n";
+    cout << eval.select << endl;
+    cout << ts.header() << endl;
 }

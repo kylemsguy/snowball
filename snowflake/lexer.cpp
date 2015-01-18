@@ -46,9 +46,12 @@ std::unordered_map<string, Date_val> keywords {
 
     {"and",{Kind::CONT,0}},
 
-    // action 0: cancelled 1: moved 
+    // action 0: cancelled 1: moved  2: add
     {"Cancelled",{Kind::ACT,0}},{"Cancel",{Kind::ACT,0}},{"cancelled",{Kind::ACT,0}},{"cancel",{Kind::ACT,0}},
+    {"Canceled",{Kind::ACT,0}},{"canceled",{Kind::ACT,0}},
     {"Moved",{Kind::ACT,1}},{"Move",{Kind::ACT,1}},{"move",{Kind::ACT,1}},{"moved",{Kind::ACT,1}},
+    {"Rescheduled",{Kind::ACT,1}},{"rescheduled",{Kind::ACT,1}},
+    {"Add",{Kind::ACT,2}},{"add",{Kind::ACT,2}}
 
     };
 
@@ -68,9 +71,20 @@ Token Token_stream::get() {
 
     do {  // skip all whitespace except newline
         if(!ip->get(c)) return ct = {};  // no char can be read from ip
-    } while (c != '\n' && isspace(c));
+    } while (isspace(c));
 
     switch(c) {
+        case '.':
+        case ';':
+            // first end of expression after subject found
+            if (!crs.empty() && !last && ct.kind != Kind::MTH) last = index();
+            else if (crs.empty()) {
+                do {  
+                    if(!ip->get(c)) return ct = {};  // no char can be read from ip
+                } while (isspace(c));
+                start = index();
+            }
+            return ct = {};
         case '0':
         case '1':
         case '2':
@@ -83,9 +97,9 @@ Token Token_stream::get() {
         case '9':
             ip->putback(c);
             *ip >> ct.number_val;
-            cerr << "NUMBER: " << static_cast<char>(ct.kind) << ' ' << ct.number_val << endl;
+            //cerr << "NUMBER: " << static_cast<char>(ct.kind) << ' ' << ct.number_val << endl;
             if (ct.number_val > 31 || ct.number_val < 0) ct.kind = Kind::NUL;
-            else if (ct.kind == Kind::MTH || ct.kind == Kind::DAY || ct.kind == Kind::CONT || 
+            else if (pt.kind == Kind::MTH || ct.kind == Kind::MTH || ct.kind == Kind::DAY || ct.kind == Kind::CONT || 
                 (ip->peek() == 't') || (ip->peek() == 'r') || (ip->peek() == 's'))
                 ct.kind = Kind::ABS;
             else ct.kind = Kind::NUL;   // 9 am, other unknown dates
@@ -98,21 +112,26 @@ Token Token_stream::get() {
                 string kw (1,c);
                 while (ip->get(c) && isalpha(c))
                     kw += c;    // append each letter of name
+                //cerr << "STRING: " << static_cast<char>(ct.kind) << ' ' <<  kw << endl;
+                ip->putback(c);     // while loop reads 1 extra char
                 // check if string is course code or room number
                 if (isdigit(ip->peek())) {
                     if (protocol->start_coursecode(kw)) {
+                        //cerr << "Passed start course code \n";
                         while (ip->get(c) && isdigit(c)) kw += c;
                         if (protocol->end_coursecode(kw)) crs = kw;
+                        //cerr << "Result of concatenation: " << kw << " \n";
+                        crs_start = static_cast<size_t>(index()) - kw.size();
                         return ct;
                     }
                     else if (protocol->start_roomlocation(kw)) {
+                        //cerr << "Passed start room location \n";
                         while (ip->get(c) && isdigit(c)) kw += c;
                         if (protocol->end_roomlocation(kw)) loc = kw;
+                        //cerr << "Result of concatenation: " << kw << " \n";
                         return ct;
                     }
                 }
-                cerr << "STRING: " << static_cast<char>(ct.kind) << ' ' <<  kw << endl;
-                ip->putback(c);     // while loop reads 1 extra char
                 auto itr = keywords.find(kw);
                 if (itr == keywords.end()) return {};
                 Date_val date = itr->second;
