@@ -1,6 +1,8 @@
 #include <unordered_map>
 #include "lexer.h"
 
+constexpr int lifetime = 1;
+
 using namespace std;
 
 struct Date_val {
@@ -40,7 +42,13 @@ std::unordered_map<string, Date_val> keywords {
     {"Wed",{Kind::DAY,3}},{"wed",{Kind::DAY,3}},
     {"Thur",{Kind::DAY,4}},{"thur",{Kind::DAY,4}},
     {"Fri",{Kind::DAY,5}},{"fri",{Kind::DAY,5}},
-    {"Sat",{Kind::DAY,6}},{"sat",{Kind::DAY,6}}
+    {"Sat",{Kind::DAY,6}},{"sat",{Kind::DAY,6}},
+
+    {"and",{Kind::CONT,0}},
+
+    // action 0: cancelled 1: moved 
+    {"Cancelled",{Kind::ACT,0}},{"Cancel",{Kind::ACT,0}},{"cancelled",{Kind::ACT,0}},{"cancel",{Kind::ACT,0}},
+    {"Moved",{Kind::ACT,1}},{"Move",{Kind::ACT,1}},{"move",{Kind::ACT,1}},{"moved",{Kind::ACT,1}},
 
     };
 
@@ -52,7 +60,11 @@ Token Token_stream::get() {
     ++pos;
     char c = 0;
     // update only if valuable
-    if (ct.kind != Kind::NUL) pt = ct;
+    if (ct.kind != Kind::NUL) {
+        pt = ct;
+        // throw out if too old
+        if (pos > ct.pos + lifetime) ct = {};
+    }
 
     do {  // skip all whitespace except newline
         if(!ip->get(c)) return ct = {};  // no char can be read from ip
@@ -71,8 +83,10 @@ Token Token_stream::get() {
         case '9':
             ip->putback(c);
             *ip >> ct.number_val;
+            cerr << "NUMBER: " << static_cast<char>(ct.kind) << ' ' << ct.number_val << endl;
             if (ct.number_val > 31 || ct.number_val < 0) ct.kind = Kind::NUL;
-            else if (pt.kind == Kind::MTH || (c == 't' && ip->peek() == 'h') || (c == 'r' && ip->peek() == 'd') || (c == 's' && ip->peek() == 't'))
+            else if (ct.kind == Kind::MTH || ct.kind == Kind::DAY || ct.kind == Kind::CONT || 
+                (c == 't' && ip->peek() == 'h') || (c == 'r' && ip->peek() == 'd') || (c == 's' && ip->peek() == 't'))
                 ct.kind = Kind::ABS;
             else ct.kind = Kind::NUL;   // 9 am, other unknown dates
 
@@ -91,7 +105,7 @@ Token Token_stream::get() {
                 string kw (1,c);
                 while (ip->get(c) && isalpha(c))
                     kw += c;    // append each letter of name
-                cerr << "STRING: " << kw << endl;
+                cerr << "STRING: " << static_cast<char>(ct.kind) << ' ' <<  kw << endl;
                 ip->putback(c);     // while loop reads 1 extra char
                 auto itr = keywords.find(kw);
                 if (itr == keywords.end()) return {};
