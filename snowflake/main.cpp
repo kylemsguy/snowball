@@ -15,4 +15,6 @@ int main(int argc, char* argv[]) {
     for (auto d : dates) 
         cerr << d << endl;
     if (dates.empty()) cout << "Empty dates!\n";
+    
+    cerr << "Action: " << ts.action().number_val << endl;
 }

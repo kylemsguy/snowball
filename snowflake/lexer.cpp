@@ -44,7 +44,11 @@ std::unordered_map<string, Date_val> keywords {
     {"Fri",{Kind::DAY,5}},{"fri",{Kind::DAY,5}},
     {"Sat",{Kind::DAY,6}},{"sat",{Kind::DAY,6}},
 
-    {"and",{Kind::CONT,0}}
+    {"and",{Kind::CONT,0}},
+
+    // action 0: cancelled 1: moved 
+    {"Cancelled",{Kind::ACT,0}},{"Cancel",{Kind::ACT,0}},{"cancelled",{Kind::ACT,0}},{"cancel",{Kind::ACT,0}},
+    {"Moved",{Kind::ACT,1}},{"Move",{Kind::ACT,1}},{"move",{Kind::ACT,1}},{"moved",{Kind::ACT,1}},
 
     };
 

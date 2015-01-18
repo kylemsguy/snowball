@@ -18,7 +18,17 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
     	ts.get();
     	// cerr << res.size() << ' ' << static_cast<int>(ts.peek()) << endl;
         switch (ts.current().kind) {
-            // continuation such as and, extendds life time of previous modifier
+            // action of the message found, expects 1 per message
+            case Kind::ACT: {
+                if (ts.action().kind != Kind::NUL) cerr << "Multiple ACTions inside message\n";
+                ts.action() = ts.cur();
+
+                cerr << "ACTion found " << static_cast<char>(ts.prev().kind) << ' ' << ts.action().number_val << endl;
+
+                ts.cur() = {};  // clear
+                break;
+            }
+            // continuation such as and, extends life time of previous modifier
             case Kind::CONT: {
                 if (ts.prev().kind != Kind::NUL) {
                     cerr << "CONTinuation phrase found " << ts.prev().pos;
@@ -30,8 +40,9 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
             }
         	// today, tomorrow, directly a date
         	case Kind::DIR: {
-        		cerr << "DIRect date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << '\n' ;
-        		cur += ts.current().number_val;
+                cur += ts.current().number_val;
+
+        		cerr << "DIRect date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << '\n' ;
 
         		res.push_back(cur);
                 cur = sentdate;
@@ -66,8 +77,9 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
         		cerr << "DAY date found\n";
             	// assume next if not specified, eg. the assignment is due [this] thursday
             	if (ts.prev().kind == Kind::NUL) {
-                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << endl;
                     cur +=  ts.current().number_val - cur.dayofweek();
+
+                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << endl;
 
                     res.push_back(cur);
                     cur = sentdate;
@@ -75,9 +87,10 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
                 }
                 // next wednesday, need to know what day currently is
                 else if (ts.prev().kind == Kind::REL && close_enough(3)) {
-                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << endl;
                     cur += ts.prev().number_val;
                     cur += ts.current().number_val - cur.dayofweek();
+
+                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << endl;
 
                     res.push_back(cur);
                     cur = sentdate;
