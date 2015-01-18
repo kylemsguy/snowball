@@ -43,7 +43,7 @@ def delete_matching_event(access_token, cal_id, course, location, date):
     page_token = None
     while True:
         events = service.events().list(calendarId=cal_id, pageToken=page_token,
-            timeMin=datetime.datetime(date[2], date[1], date[0]).isoformat() + "Z",
+            timeMin=datetime.datetime(date[2], date[1], date[0]-1).isoformat() + "Z",
             timeMax=datetime.datetime(date[2], date[1], date[0]+1).isoformat()  + "Z").execute()
         for event in events['items']:
             if course.lower() in event["summary"].lower() and location.lower() in event["location"].lower():
