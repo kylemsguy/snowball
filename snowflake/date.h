@@ -26,6 +26,12 @@ public:
 	Date(const Date& date) : d{date.d}, m{date.m}, y{date.y} {}
 	Date(Date&& date) : d{date.d}, m{date.m}, y{date.y} {}
 
+	Date& operator=(const Date& date) {
+		d = date.d;
+		m = date.m;
+		y = date.y;
+		return *this;
+	}
 	Date& operator=(Date&& date) {
 		d = date.d;
 		m = date.m;

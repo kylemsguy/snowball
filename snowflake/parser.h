@@ -6,63 +6,82 @@
 
 using namespace std;
 
+bool close_enough(int epsilon) {
+    return ts.current().pos - ts.prev().pos < epsilon;
+} 
 
 vector<Date> all_dates(Date sentdate) {    // add and subtract
 	vector<Date> res;
+    Date cur{sentdate};
     while (!ts.eof()) {
     	ts.get();
-    	// cout << res.size() << ' ' << static_cast<int>(ts.peek()) << endl;
-		Date cur{sentdate};
+    	// cerr << res.size() << ' ' << static_cast<int>(ts.peek()) << endl;
         switch (ts.current().kind) {
         	// today, tomorrow, directly a date
         	case Kind::DIR: {
-        		cout << "DIRect date found\n";
+        		cerr << "DIRect date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << '\n' ;
         		cur += ts.current().number_val;
-        		res.push_back(cur);
 
+        		res.push_back(cur);
+                cur = sentdate;
         		ts.clear();
+                break;
         	}
         	// 4th, 5th, ... first absolute day in month
         	case Kind::ABS: {
-        		cout << "ABSolute date found\n";
-        		if (ts.prev().kind == Kind::MTH) {
+        		cerr << "ABSolute date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << '\n';
+        		if (ts.prev().kind == Kind::MTH || ts.prev().kind == Kind::NUL) {
         			cur.day() = ts.current().number_val;
-        			res.push_back(cur);
 
+        			res.push_back(cur);
+                    cur = sentdate;
         			ts.clear();
         		}
         		break;
         	}
             case Kind::DAY: {
-        		cout << "DAY date found\n";
+        		cerr << "DAY date found\n";
             	// assume next if not specified, eg. the assignment is due [this] thursday
             	if (ts.prev().kind == Kind::NUL) {
-            		cur +=  ts.current().number_val - cur.dayofweek();
-            		res.push_back(cur);
+                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << endl;
+                    cur +=  ts.current().number_val - cur.dayofweek();
 
-            		ts.clear();
-            	}
-        		// next wednesday, need to know what day currently is
-            	else if (ts.prev().kind == Kind::REL) {
-            		cur += ts.prev().number_val;
-            		cur += ts.current().number_val - cur.dayofweek();
-            		res.push_back(cur);
+                    res.push_back(cur);
+                    cur = sentdate;
+                    ts.clear();
+                }
+                // next wednesday, need to know what day currently is
+                else if (ts.prev().kind == Kind::REL && close_enough(3)) {
+                    cerr << "DAY date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << endl;
+                    cur += ts.prev().number_val;
+                    cur += ts.current().number_val - cur.dayofweek();
 
-            		ts.clear();
-            	}
-            	break;
+                    res.push_back(cur);
+                    cur = sentdate;
+                    ts.clear();
+                }
+                break;
             } 
             case Kind::MTH: {
-        		cout << "MTH date found\n";
-            	// only valid if no other valid types have been matched
-            	if (ts.prev().kind == Kind::NUL)
-            		cur.mth() = ts.current().number_val;
-            	else
-            		ts.clear();
+                // only valid if no other valid types have been matched    
+                cur.mth() = ts.current().number_val;
+                cerr << "MTH date found " << cur.mth() << endl;
+                // for odd naming scheme like 23 Oct, close enough together
+                if (ts.prev().kind == Kind::DAY && close_enough(3)) {
+                    cur.day() = ts.prev().number_val;
+
+                    cerr << "MTH date pushed: " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << endl;
+
+                    res.push_back(cur);
+                    cur = sentdate;
+                    ts.clear();
+                }
+
+
             	break;
             }
             case Kind::REL: {
-        		cout << "RELation date found\n";
+        		cerr << "RELation date found\n";
             	// next next monday
             	if (ts.prev().kind == Kind::REL) ts.current().number_val += ts.prev().number_val;
             }

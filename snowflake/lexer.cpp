@@ -33,7 +33,14 @@ std::unordered_map<string, Date_val> keywords {
     {"Wednesday",{Kind::DAY,3}},{"wednesday",{Kind::DAY,3}},
     {"Thursday",{Kind::DAY,4}},{"thursday",{Kind::DAY,4}},
     {"Friday",{Kind::DAY,5}},{"friday",{Kind::DAY,5}},
-    {"Saturday",{Kind::DAY,6}},{"saturday",{Kind::DAY,6}}
+    {"Saturday",{Kind::DAY,6}},{"saturday",{Kind::DAY,6}},
+    {"Sun",{Kind::DAY,0}},{"sun",{Kind::DAY,0}},
+    {"Mon",{Kind::DAY,1}},{"mon",{Kind::DAY,1}},
+    {"Tues",{Kind::DAY,2}},{"tues",{Kind::DAY,2}},
+    {"Wed",{Kind::DAY,3}},{"wed",{Kind::DAY,3}},
+    {"Thur",{Kind::DAY,4}},{"thur",{Kind::DAY,4}},
+    {"Fri",{Kind::DAY,5}},{"fri",{Kind::DAY,5}},
+    {"Sat",{Kind::DAY,6}},{"sat",{Kind::DAY,6}}
 
     };
 
@@ -42,6 +49,7 @@ Token_stream ts {nullptr};
 Token Token_stream::get() {
     // read 1 char, decide what kind of token is incoming,
     // appropriately read more char then return Token
+    ++pos;
     char c = 0;
     // update only if valuable
     if (ct.kind != Kind::NUL) pt = ct;
@@ -64,26 +72,34 @@ Token Token_stream::get() {
             ip->putback(c);
             *ip >> ct.number_val;
             if (ct.number_val > 31 || ct.number_val < 0) ct.kind = Kind::NUL;
-            else ct.kind = Kind::ABS;
+            else if (pt.kind == Kind::MTH || (c == 't' && ip->peek() == 'h') || (c == 'r' && ip->peek() == 'd') || (c == 's' && ip->peek() == 't'))
+                ct.kind = Kind::ABS;
+            else ct.kind = Kind::NUL;   // 9 am, other unknown dates
+
+            ct.pos = pos;
             return ct;
         default:    // name, name =, or error
             if (isalpha(c)) {
                 if (ct.kind == Kind::DAY) { // 10th, 1st, etc..
                     // read through past 2 characters
                     while (ip->get(c) && isalpha(c)) ;
-                    return ct;
+
+                    ct.pos = pos;
+                    return ct;                    
                 }
                 // potential keyword
                 string kw (1,c);
                 while (ip->get(c) && isalpha(c))
                     kw += c;    // append each letter of name
-                cout << "STRING: " << kw << endl;
+                cerr << "STRING: " << kw << endl;
                 ip->putback(c);     // while loop reads 1 extra char
                 auto itr = keywords.find(kw);
                 if (itr == keywords.end()) return {};
                 Date_val date = itr->second;
                 ct.kind = date.type;
                 ct.number_val = date.val;
+
+                ct.pos = pos;
                 return ct;
             }
             return {};
