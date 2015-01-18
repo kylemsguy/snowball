@@ -98,6 +98,19 @@ Token Token_stream::get() {
                 string kw (1,c);
                 while (ip->get(c) && isalpha(c))
                     kw += c;    // append each letter of name
+                // check if string is course code or room number
+                if (isdigit(ip->peek())) {
+                    if (protocol->start_coursecode(kw)) {
+                        while (ip->get(c) && isdigit(c)) kw += c;
+                        if (protocol->end_coursecode(kw)) crs = kw;
+                        return ct;
+                    }
+                    else if (protocol->start_roomlocation(kw)) {
+                        while (ip->get(c) && isdigit(c)) kw += c;
+                        if (protocol->end_roomlocation(kw)) loc = kw;
+                        return ct;
+                    }
+                }
                 cerr << "STRING: " << static_cast<char>(ct.kind) << ' ' <<  kw << endl;
                 ip->putback(c);     // while loop reads 1 extra char
                 auto itr = keywords.find(kw);
