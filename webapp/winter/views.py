@@ -9,6 +9,7 @@ import contextio
 import json
 from winter.models import *
 import datetime
+import traceback
 
 # Create your views here.
 
@@ -28,11 +29,15 @@ def contextio_callback(request):
 			handle_callback(user, user_profile, provider, payload)
 		return HttpResponse("Success")
 	except BaseException as e:
-		print e
+		traceback.format_exc
 		raise e
 
 def handle_callback(user, user_profile, provider, payload):
-	print(user, user_profile, provider, payload)
+	for body in payload["message_data"]["body"]:
+		if body["type"] == "text/plain":
+			break
+	plain_text = body["content"]
+	print(plain_text)
 
 @csrf_exempt
 def contextio_failure_callback(request):
