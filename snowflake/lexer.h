@@ -72,7 +72,7 @@ public:
         ip->seekg(start);
         do {
             res += ip->get();
-        } while (ip->tellg() != last);
+        } while (ip->tellg() != last && ip->tellg() != -1);
         return res;
     }
 
