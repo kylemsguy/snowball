@@ -10,14 +10,15 @@ enum class Kind : char {
 struct Token {
     Kind kind;
     int number_val;
+    int pos;   // position in the text, used for proxity checking
     Token() : kind{Kind::NUL} {}
-    Token(Kind k, int v) : kind{k}, number_val{v} {}
+    Token(Kind k, int v, int p) : kind{k}, number_val{v}, pos{p} {}
 };
 
 class Token_stream {
 public:
-    Token_stream(istream& instream_ref) : ip{&instream_ref}, owns{false} {}
-    Token_stream(istream* instream_pt) : ip{instream_pt}, owns{true} {}
+    Token_stream(istream& instream_ref) : ip{&instream_ref}, pos{-1}, owns{false} {}
+    Token_stream(istream* instream_pt) : ip{instream_pt}, pos{-1}, owns{true} {}
     ~Token_stream() {if (owns) delete ip;}
 
     Token get();    // read and return next token
@@ -33,6 +34,7 @@ private:
     istream* ip;    // input stream pointer
     Token ct {};   // current token, default value in case of misuse
     Token pt {};
+    int pos;       // start at -1 to increment before usage in get (so 0 is first)
     bool owns;
 };
 
