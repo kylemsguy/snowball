@@ -9,10 +9,10 @@ enum class Kind : char {
 };
 
 struct School_protocol {
-    virtual bool start_coursecode(const string& s);
-    virtual bool start_roomlocation(const string& s);
-    virtual bool end_coursecode(const string& s);
-    virtual bool end_roomlocation(const string& s);
+    virtual bool start_coursecode(const string& s) = 0;
+    virtual bool start_roomlocation(const string& s) = 0;
+    virtual bool end_coursecode(const string& s) = 0;
+    virtual bool end_roomlocation(const string& s) = 0;
 };
 struct Toronto_protocol : School_protocol {
     bool start_coursecode(const string& s) override {
