@@ -10,7 +10,11 @@
     "watchface": true
   },
   "appKeys": {
-    "KEY_DATA": 5
+    "KEY_DATA": 5,
+    "status": 0,
+    "evTitle": 1,
+    "evStart": 2,
+    "evEnd": 3
   },
   "resources": {
     "media": [
