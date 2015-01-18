@@ -16,7 +16,12 @@
     "media": [
       {
         "type": "font",
-        "name": "WHAT_TIME_IS_IT_36",
+        "name": "WHAT_TIME_IS_IT_47",
+        "file": "WHATTIME.TTF"
+      },
+      {
+        "type": "font",
+        "name": "WHAT_TIME_IS_IT_24",
         "file": "WHATTIME.TTF"
       }
     ]
