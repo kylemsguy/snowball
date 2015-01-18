@@ -5,13 +5,25 @@
   "companyName": "MakeAwesomeHappen",
   "versionCode": 1,
   "versionLabel": "1.0",
+  "capabilities": [ "configurable" ],
   "watchapp": {
     "watchface": true
   },
   "appKeys": {
-    "dummy": 0
+    "KEY_DATA": 5
   },
   "resources": {
-    "media": []
+    "media": [
+      {
+        "type": "font",
+        "name": "WHAT_TIME_IS_IT_47",
+        "file": "WHATTIME.TTF"
+      },
+      {
+        "type": "font",
+        "name": "WHAT_TIME_IS_IT_24",
+        "file": "WHATTIME.TTF"
+      }
+    ]
   }
 }
