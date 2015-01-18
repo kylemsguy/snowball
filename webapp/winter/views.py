@@ -48,9 +48,9 @@ def handle_callback(user, user_profile, provider, payload):
 	strategy = load_strategy()
 
 	social.refresh_token(strategy)
-	if action == 0: # delete
+	if action == "0": # delete
 		delete_matching_event(social.tokens, user.email, course, location, date)
-	elif action == 1 or action == 2:
+	elif action == "1" or action == "2":
 		quick_add_event(social.tokens, user.email, plain_text if len(header) < 2 else header)
 
 @csrf_exempt
