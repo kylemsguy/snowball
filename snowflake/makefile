@@ -11,11 +11,11 @@ all: $(EXECUTIBLE)
 $(EXECUTIBLE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@
 
-$(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) -c 
+%.o: %.cpp
+	$(CC) -c $(CFLAGS) -o $@ $^
 
 clean:
-	rm -rf *o snow
+	rm -rf *.o snow
 
 test: $(EXECUTIBLE)
 	valgrind -q --track-origins=yes ./$(EXECUTIBLE)
