@@ -5,7 +5,7 @@
 using namespace std;
 
 enum class Kind : char {
-    ABS = 'a', DIR = 'b', DAY = 'd', MTH = 'm', NUL = 'n', REL = 'r'
+    ABS = 'a', DIR = 'b', DAY = 'd', MTH = 'm', NUL = 'n', REL = 'r', CONT = 't'    // continuation
 };
 struct Token {
     Kind kind;
@@ -13,6 +13,7 @@ struct Token {
     int pos;   // position in the text, used for proxity checking
     Token() : kind{Kind::NUL}, pos{-1} {}
     Token(Kind k, int v, int p) : kind{k}, number_val{v}, pos{p} {}
+    Token& operator=(const Token& other) = default;
 };
 
 class Token_stream {
@@ -23,6 +24,7 @@ public:
 
     Token get();    // read and return next token
     Token& current() { return ct; } // most recently read token
+    Token& cur() { return ct; } 
     Token& prev() { return pt; }
     int peek() const {return ip->peek();}
     bool eof() const { return ip->eof() || ip->peek() == -1; }

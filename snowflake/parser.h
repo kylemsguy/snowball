@@ -3,6 +3,7 @@
 #include "date.h"
 #include "lexer.h"
 
+constexpr int lifeboost = 3;
 
 using namespace std;
 
@@ -17,6 +18,16 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
     	ts.get();
     	// cerr << res.size() << ' ' << static_cast<int>(ts.peek()) << endl;
         switch (ts.current().kind) {
+            // continuation such as and, extendds life time of previous modifier
+            case Kind::CONT: {
+                if (ts.prev().kind != Kind::NUL) {
+                    cerr << "CONTinuation phrase found " << ts.prev().pos;
+                    ts.cur() = ts.prev();
+                    ts.cur().pos += lifeboost;
+                    cerr << " increased to " << ts.cur().pos << endl; 
+                }
+                break;
+            }
         	// today, tomorrow, directly a date
         	case Kind::DIR: {
         		cerr << "DIRect date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << '\n' ;
@@ -29,14 +40,26 @@ vector<Date> all_dates(Date sentdate) {    // add and subtract
         	}
         	// 4th, 5th, ... first absolute day in month
         	case Kind::ABS: {
-        		cerr << "ABSolute date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << ts.current().number_val << '\n';
-        		if (ts.prev().kind == Kind::MTH || ts.prev().kind == Kind::NUL) {
-        			cur.day() = ts.current().number_val;
+                if (ts.prev().kind == Kind::MTH || ts.prev().kind == Kind::NUL) {
+                    cur.day() = ts.current().number_val;
 
-        			res.push_back(cur);
+                    cerr << "ABSolute date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << '\n';
+
+                    res.push_back(cur);
                     cur = sentdate;
-        			ts.clear();
-        		}
+                    ts.clear();
+                }
+                // weird format like 4 Oct, do a lookahead
+                else if (ts.get().kind == Kind::MTH) {
+                    cur.mth() = ts.current().number_val;
+                    cur.day() = ts.prev().number_val;
+
+            		cerr << "ABSolute date found " << static_cast<char>(ts.prev().kind) << ' ' << cur.mth() << ' ' << cur.day() << '\n';
+
+                    res.push_back(cur);
+                    cur = sentdate;
+                    ts.clear();
+                }
         		break;
         	}
             case Kind::DAY: {
