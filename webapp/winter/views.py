@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 from throw_ball import *
 from social.apps.django_app.utils import load_strategy
 
-# Create your views here.
 
 @csrf_exempt
 def contextio_callback(request):
@@ -44,6 +43,8 @@ def handle_callback(user, user_profile, provider, payload):
 	action, course, location, date, header = snowflake_runner.run_snowflake(
 		datetime.datetime.fromtimestamp(payload["message_data"]["date_received"]), payload["message_data"]["subject"] +
 		"\n" + plain_text)
+    if action is None:
+        return
 	social = user.social_auth.get(provider="google-oauth2")
 	strategy = load_strategy()
 

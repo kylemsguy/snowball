@@ -9,6 +9,8 @@ def run_snowflake(mydate, mytext):
 	proc = subprocess.Popen([executable_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	stdoutdata, stderrdata = proc.communicate(inputdata)
 	parts = stdoutdata.strip().split("\n")
+    if parts[0] in "Empty dates!":
+        return (None,None,None,None,None)
 	action = parts[0].split(":", 1)[1].strip()
 	course = parts[1].split(":", 1)[1].strip()
 	location = parts[2].split(":", 1)[1].strip()
